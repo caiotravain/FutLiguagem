@@ -1,7 +1,7 @@
 # FutLiguage
 language de futebol
 
-
+<p>
 BLOCK = { STATEMENT };
 STATEMENT = ( team_setup | match_declaration | player_action | goal_event ), "\n" ;
 team_setup  = "team", team_name, "{", { player_declaration }, "}" ;
@@ -19,3 +19,4 @@ skill_value = digit, { digit } ;
 time_value = digit, { digit } ;
 LETTER = ( "a" | "..." | "z" | "A" | "..." | "Z" ) ;
 DIGIT = ( "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "0" ) ;
+</p>
