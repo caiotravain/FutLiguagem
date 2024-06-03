@@ -97,9 +97,6 @@ MATCHTIME "MATCHTIME"
 {PRINT} {
     return PRINT;
 }
-{BALLCONTROL} {
-    return BALLCONTROL;
-}
 {TRUE} {
     return TRUE;
 }
