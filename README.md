@@ -9,7 +9,7 @@ match_declaration = "match", team_name, "vs", team_name, "{", { actions}, "}" ; 
 player_declaration = TEAM, DOT, "AddPlayer", "(", NAME, "SKILL", SKILL_BOOL_EXPRESSION, ")", "\n" ; <br/>
 SKILL_LOOKUP = TEAM, DOT, PLAYER,DOT, "SKILL"; 
 actions = (player_action,  | 
-if_statement  |  remove,  | skill_assigment  |  match_action | print_function) ; <br/>
+if_statement  |  remove,  | skill_assigment  |  match_action | print_function | match_declaration) ; <br/>
 
 print_function = "PRINT", "TEAM", TEAM  |   "PRINT", "PLAYER", TEAM ,  DOT , PLAYER  ;<br/>
 
