@@ -92,12 +92,12 @@ extern int yydebug;
     SCORES = 293,                  /* SCORES  */
     AS = 294,                      /* AS  */
     ARROW = 295,                   /* ARROW  */
-    BALLCONTROL = 296,             /* BALLCONTROL  */
-    TRUE = 297,                    /* TRUE  */
-    false_id = 298,                /* false_id  */
-    IF = 299,                      /* IF  */
-    ENDMATCH = 300,                /* ENDMATCH  */
-    MATCHTIME = 301                /* MATCHTIME  */
+    TRUE = 296,                    /* TRUE  */
+    false_id = 297,                /* false_id  */
+    IF = 298,                      /* IF  */
+    ENDMATCH = 299,                /* ENDMATCH  */
+    MATCHTIME = 300,               /* MATCHTIME  */
+    S = 301                        /* S  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif

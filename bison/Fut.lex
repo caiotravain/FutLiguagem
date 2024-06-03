@@ -26,6 +26,7 @@ MATCHTIME "MATCHTIME"
 
 
 
+
 %%
 
 {WS}
@@ -53,6 +54,7 @@ MATCHTIME "MATCHTIME"
 "and" { return AND; }
 "or" { return OR; }
 "not" { return NOT; }
+"s" { return S; }
 
 
 
