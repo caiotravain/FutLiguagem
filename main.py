@@ -852,10 +852,8 @@ class Block(Node):
 
     def evaluate(self, SymbolTable: SymbolTable):
         for child in self.children:
-            if isinstance(child, ReturnOp):
-                return child.evaluate(SymbolTable)[0]
-            else:
-                child.evaluate(SymbolTable)
+            
+            child.evaluate(SymbolTable)
             #if is a return, return the value
             
             
@@ -1008,67 +1006,6 @@ class WhileOp(Node):
         def get_match_table(self):
             return match_table
 
-class ReadOp(Node):
-    def __init__(self, value):
-        super().__init__(value)
-
-    def evaluate(self, SymbolTable: SymbolTable):
-        return (self.value, "int")
-
-class FuncDec(Node):
-    def __init__(self, value, children):
-        super().__init__(value, children)
-
-    def evaluate(self, SymbolTable: SymbolTable):
-        if self.children[0] in FuncTable.func_table:
-            sys.stderr.write(f"Erro: Funcao {self.children[0]} ja declarada\n")
-            sys.exit(1)
-        
-        FuncTable.add_func(self.children[0], self.children[1], self.children[2])
-        
-
-
-class FuncCall(Node):
-    def __init__(self, value, children):
-        super().__init__(value, children)
-
-    def evaluate(self, SymbolTable_2: SymbolTable):
-        func = FuncTable.get_func(self.value.value)[0]
-        args_numb = FuncTable.get_func(self.value.value)[1]
-        args = self.children
-        for i in range(len(args)):
-            args[i] = args[i].evaluate(SymbolTable_2)[0]
-
-        if len(args) != len(args_numb):
-            sys.stderr.write("Erro: Argumentos invalidos")
-            sys.exit(1)      
-        new_table = SymbolTable()
-        new_table.set(self.value.value, 0, "int")
-        for i in range(len(args)):
-            new_table.set(args_numb[i], args[i], "int")
-        saida = func.evaluate(new_table)
-        return (saida, "int")
-
-class ReturnOp(Node):
-    def __init__(self, value):
-        super().__init__(value)
-
-    def evaluate(self, SymbolTable: SymbolTable):
-        #return the value of the expression
-        return self.value.evaluate(SymbolTable)
-
-
-class FuncTable():
-    func_table = {}
-
-    @staticmethod
-    def add_func(name: str, func, args):
-        FuncTable.func_table[name] = (func, args)
-    
-
-    @staticmethod
-    def get_func(name: str):
-        return FuncTable.func_table[name]
 
         
 
