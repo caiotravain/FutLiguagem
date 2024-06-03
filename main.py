@@ -830,7 +830,7 @@ class VarDec(Node):
 
     def evaluate(self, SymbolTable: SymbolTable):
         if self.children[0] in SymbolTable.table:
-            sys.stderr.write(f"Erro: Variavel {self.children[0].value} ja declarada\n")
+            sys.stderr.write(f"Erro: Variavel {self.children[0]} ja declarada\n")
             sys.exit(1)
         SymbolTable.set(self.children[0], 0)
 
