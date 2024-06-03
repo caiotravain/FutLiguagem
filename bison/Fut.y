@@ -102,7 +102,7 @@ remove:
     ;
     
 player_action:
-    |IDENTIFIER DOT IDENTIFIER PASSES IDENTIFIER DOT IDENTIFIER
+    |IDENTIFIER DOT IDENTIFIER PASSES
     |IDENTIFIER DOT IDENTIFIER SHOOTS
     |IDENTIFIER DOT IDENTIFIER SCORES
     ;
@@ -141,16 +141,20 @@ skill_term:
 skill_factor:
     | NUMBER
     | skill_lookup
+    | match_set_time
     | LPAREN skill_expression RPAREN
     | NOT skill_factor
     | PLUS skill_factor
     | MINUS skill_factor
 
+match_set_time:
+    | MATCHTIME
+
 skill_assignment:
     | IDENTIFIER DOT IDENTIFIER DOT SKILL ASSIGN skill_bool_expression
 
 match_time :
-    | MATCHTIME LPAREN NUMBER RPAREN
+    | MATCHTIME LPAREN skill_bool_expression RPAREN
 
 
     
