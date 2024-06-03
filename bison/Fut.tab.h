@@ -96,7 +96,8 @@ extern int yydebug;
     false_id = 297,                /* false_id  */
     IF = 298,                      /* IF  */
     ENDMATCH = 299,                /* ENDMATCH  */
-    MATCHTIME = 300                /* MATCHTIME  */
+    MATCHTIME = 300,               /* MATCHTIME  */
+    S = 301                        /* S  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -110,7 +111,7 @@ union YYSTYPE
     char *sval;
     int ival;
 
-#line 114 "Fut.tab.h"
+#line 115 "Fut.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
