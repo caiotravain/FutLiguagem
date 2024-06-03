@@ -78,7 +78,6 @@ match_declaration:
     
 actions:
     | player_action EOL actions 
-    | ball_control EOL actions
     | if_statement EOL actions
     | remove EOL actions
     | skill_assignment EOL actions
@@ -100,19 +99,13 @@ actions:
     ;
 
 remove:
-    | REDCARD IDENTIFIER DOT IDENTIFIER 
-    | REDCARD IDENTIFIER
+    | IDENTIFIER DOT IDENTIFIER REDCARD 
     ;
     
 player_action:
-    |IDENTIFIER DOT IDENTIFIER DRIBBLES IDENTIFIER DOT IDENTIFIER
     |IDENTIFIER DOT IDENTIFIER PASSES IDENTIFIER DOT IDENTIFIER
     |IDENTIFIER DOT IDENTIFIER SHOOTS
     |IDENTIFIER DOT IDENTIFIER SCORES
-    ;
-ball_control:
-    | BALLCONTROL  false_id 
-    | BALLCONTROL  TRUE 
     ;
 if_statement:
     | IF LPAREN skill_bool_expression RPAREN LBRACE EOL actions RBRACE

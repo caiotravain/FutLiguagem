@@ -14,7 +14,7 @@ class Tokenizer :
         self.source = source
         self.position = position
         self.next = next
-        self.lista = ["PRINT", "TEAM", "PASSES", "SCORES", "SHOOTS", "REDCARD", "MATCH", "PLAYER", "SKILL", "PRINT", "AddPlayer","BALLCONTROL", "ENDMATCH", "MATCHTIME", "if", "else", "end", "VS"]
+        self.lista = ["PRINT", "TEAM", "PASSES", "SCORES", "SHOOTS", "REDCARD", "MATCH", "PLAYER", "SKILL", "PRINT", "AddPlayer","ENDMATCH", "MATCHTIME", "if", "else", "end", "VS"]
         
 
     def selectNext(self):
@@ -315,7 +315,7 @@ class Parser:
             
             
         else:
-            print(tokenizer.next.tipo)
+            # print(tokenizer.next.tipo)
             sys.stderr.write("Erro: Expressao invalida Factor")
             sys.exit(1)
 
@@ -436,6 +436,31 @@ class Parser:
                             return Assign([Identifier([time, resultado]), resultado2])
                         else:
                             return Print([Identifier([time, resultado])])   
+                elif tokenizer.next.tipo == "SCORES":
+                        tokenizer.selectNext()
+                        if tokenizer.next.tipo != "quebra":
+                            sys.stderr.write("Erro: Falta quebra SCORES")
+                            sys.exit(1)
+                        return ScoreOp("SCORE",[time, resultado])	
+                elif tokenizer.next.tipo == "SHOOTS":
+                        tokenizer.selectNext()
+                        if tokenizer.next.tipo != "quebra":
+                            sys.stderr.write("Erro: Falta quebra SHOOTS")
+                            sys.exit(1)
+                        return ScoreOp("SHOOTS",[time, resultado])
+                elif tokenizer.next.tipo == "PASSES":
+                        tokenizer.selectNext()
+                        if tokenizer.next.tipo != "quebra":
+                            sys.stderr.write("Erro: Falta quebra PASSES")
+                            sys.exit(1)
+                        return ScoreOp("PASSES",[time, resultado])
+                elif tokenizer.next.tipo == "REDCARD":
+                        tokenizer.selectNext()
+                        if tokenizer.next.tipo != "quebra":
+                            sys.stderr.write("Erro: Falta quebra REDCARD")
+                            sys.exit(1)
+                        return ScoreOp("REDCARD",[time, resultado])
+                
         elif tokenizer.next.tipo == "PRINT":
             tokenizer.selectNext()
             resultado = Parser.parseBoolExpression(tokenizer)
@@ -532,6 +557,9 @@ class Parser:
                 sys.exit(1)
 
             tokenizer.selectNext()
+            if tokenizer.next.valor == "s":
+                tokenizer.selectNext()
+                return WhileOp("silent", (resultado2, [time1, time2]))
             return WhileOp("while", (resultado2, [time1, time2]))
         elif tokenizer.next.tipo == "MATCHTIME":
             tokenizer.selectNext()
@@ -554,6 +582,7 @@ class Parser:
                 sys.stderr.write("Erro: Falta quebra ENDMATCH")
                 sys.exit(1)
             return END_MATCH("ENDMATCH")
+        
         else:
             sys.stderr.write("Erro: Comando invalido {}".format(tokenizer.next.tipo))
             sys.exit(1)
@@ -603,13 +632,22 @@ class Match_Table:
         self.table["MATCHTIME"] = 0
     
     def set(self, name: str, value: int, type: str = "int"):
-        self.table[name] = {}
+        self.table[name] = {"GOALS":[], "REDCARDS":[],"PASSES": 0, "SHOOTS": 0}
     
     def get(self, name: str):
         return self.table[name]
     
-    def add (self, name: str, value, type: str = "int"):
-        self.table[name][value[0]] = value[1]    
+    def goal (self, name: str, value, type: str = "int"):
+        self.table[name]["GOALS"].append(value)
+
+    def redcard (self, name: str, value, type: str = "int"):
+        self.table[name]["REDCARDS"].append(value)
+    
+    def shoot (self, name: str, value, type: str = "int"):
+        self.table[name]["SHOOTS"] += 1
+
+    def passes (self, name: str, value, type: str = "int"):
+        self.table[name]["PASSES"] += 1
     
     def set_time(self, value: int):
         self.table["MATCHTIME"] = value
@@ -833,6 +871,8 @@ class IfOp(Node):
                     child.evaluate(MatchTable)
                 elif isinstance(child, END_MATCH):
                     return "END_MATCH"
+                elif isinstance(child, ScoreOp):
+                    child.evaluate(SymbolTable, MatchTable)
                 else:
                     child.evaluate(SymbolTable)
         elif len(self.children) > 2:
@@ -868,6 +908,31 @@ class END_MATCH(Node):
 
     def evaluate(self, SymbolTable: SymbolTable):
         return None
+    
+class ScoreOp(Node):
+    def __init__(self, value, children):
+        super().__init__(value, children)
+
+    def evaluate(self, SymbolTable: SymbolTable, Matchtable: Match_Table):
+        #check if the team is in the match table]
+        
+        if self.children[0] not in Matchtable.table or self.children[0] not in SymbolTable.table:
+            sys.stderr.write(f"Erro: Time {self.children[0]} nao declarado\n")
+            sys.exit(1)
+        if self.children[1] not in SymbolTable.table[self.children[0]]:
+            sys.stderr.write(f"Erro: Jogador {self.children[1]} nao declarado\n")
+            sys.exit(1) 
+        if self.value == "SCORE":
+            Matchtable.goal(self.children[0], self.children[1])
+        elif self.value == "SHOOTS":
+            Matchtable.shoot(self.children[0], self.children[1])
+        elif self.value == "PASSES":
+            Matchtable.passes(self.children[0], self.children[1])
+        elif self.value == "REDCARD":
+            Matchtable.redcard(self.children[0], self.children[1])
+            #remove the player from the team in the symbol table
+            SymbolTable.table[self.children[0]].pop(self.children[1])
+        return Matchtable.get(self.children[0])
 
 class WhileOp(Node):
     def __init__(self, value, children):
@@ -876,7 +941,6 @@ class WhileOp(Node):
     def evaluate(self, SymbolTable: SymbolTable):
         i = 0
         match_table = Match_Table()
-        print(f"Match entre {self.children[1][0]} e {self.children[1][1]}")
 
         match_table.set(self.children[1][0], 0, "int")
         match_table.set(self.children[1][1], 0, "int")
@@ -887,6 +951,8 @@ class WhileOp(Node):
                     child.evaluate(match_table)
                 elif isinstance(child, END_MATCH):
                     return None
+                elif isinstance(child, ScoreOp):
+                    child.evaluate(SymbolTable, match_table)
                 else:
                     if isinstance(child, IfOp):
                         retorno = child.evaluate(SymbolTable, match_table)
@@ -894,7 +960,46 @@ class WhileOp(Node):
                             return None
                     else:
                         child.evaluate(SymbolTable)
-                    
+        #print all match table
+        if (self.value != "silent"):
+            print("")
+            print("-----------------------GAME OVER--------------------------")
+            print(str(match_table.get("MATCHTIME")) + " minutos")
+            time1 = match_table.get(self.children[1][0])
+            time2 = match_table.get(self.children[1][1])
+            goals1 = time1["GOALS"]
+            goals2 = time2["GOALS"]
+            redcards1 = time1["REDCARDS"]
+            redcards2 = time2["REDCARDS"]
+
+            print(f"{self.children[1][0]} {len(goals1)} VS {len(goals2)} {self.children[1][1]}")
+            print(f"TEAM {self.children[1][0]} Gols :")
+            for i in goals1:
+                print("   GOAL "+i)
+            print(f"PASSES: {time1['PASSES']}")
+            print(f"SHOOTS: {time1['SHOOTS']}")
+            for i in redcards1:
+                print(f"RED CARD: {i}")
+
+            print("________________")
+            print(f"TEAM {self.children[1][1]} Gols :")
+            for i in goals2:
+                print("   GOAL "+i)
+            print(f"PASSES: {time2['PASSES']}")
+            print(f"SHOOTS: {time2['SHOOTS']}")
+            for i in redcards2:
+                print(f"RED CARD: {i}")
+            print("----------------------------------------------------------")
+            
+            
+
+        
+
+
+
+        
+
+
             # print(self.children[0].evaluate(SymbolTable))
             # i += 1
             # if i> 5:
@@ -1003,7 +1108,6 @@ if __name__ == "__main__":
     resultado = parser.run(argumeto)
     resultado.evaluate(symboltable)
     #print all symbol table
-    print(symboltable.table)
     
 
 
