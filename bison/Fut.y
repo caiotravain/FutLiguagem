@@ -86,6 +86,7 @@ actions:
     | player_action EOL actions 
     | if_statement EOL actions
     | remove EOL actions
+    | match_declaration EOL actions
     | skill_assignment EOL actions
     | EOL actions
     | match_time EOL actions
@@ -97,6 +98,7 @@ actions:
     | skill_assignment
     | match_time
     | print_function
+    | match_declaration
     | ENDMATCH
 
 
