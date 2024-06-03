@@ -30,7 +30,7 @@
 %token PRINT
 %token REDCARD
 %token MATCH VS DRIBBLES PASSES SHOOTS SCORES AS ARROW
-%token BALLCONTROL TRUE false_id IF ENDMATCH MATCHTIME
+%token TRUE false_id IF ENDMATCH MATCHTIME
 
 
 
@@ -86,7 +86,6 @@ actions:
     | print_function EOL actions
     | ENDMATCH EOL actions
     | player_action
-    | ball_control
     | if_statement
     | remove
     | skill_assignment
